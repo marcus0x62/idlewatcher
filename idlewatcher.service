@@ -1,0 +1,8 @@
+[Unit]
+Description=Idlewatcher
+
+[Service]
+ExecStart=/path/to/idlewatcher -t 300
+
+[Install]
+WantedBy=default.target
