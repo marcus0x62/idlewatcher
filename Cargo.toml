@@ -1,0 +1,16 @@
+[package]
+name = "idlewatcher"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+#[features]
+#default = ["staging"]
+
+[dependencies]
+getopts = "0.2"
+utmp-rs = "0.3"
+wayrs-client = "0.12"
+wayrs-protocols = {"version" = "0.12", features = [ "ext-idle-notify-v1" ] }
+wayrs-utils = {"version" = "0.12", features = [ "seats" ] }
