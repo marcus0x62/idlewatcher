@@ -15,6 +15,6 @@ target/release/idlewatcher.
 You can use the included idlewatcher.service unit file to automatically launch idlewatcher as a user service with systemd.  Be sure to
 edit the file to indicate where you copied the binary to, then execute:
 
-systemctl --user --now enable idlewatcher.service
+$ systemctl --user --now enable idlewatcher.service
 
-journalctl --user -u idlewatcher will show any error messages.
+$ journalctl --user -u idlewatcher will show any error messages.
