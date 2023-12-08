@@ -34,6 +34,11 @@ use wayrs_protocols::ext_idle_notify_v1::{
 };
 use utmp_rs::UtmpEntry;
 
+#[link(name = "c")]
+extern "C" {
+    fn getuid() -> u32;
+}
+
 #[derive(Debug)]
 struct State {
     idle: bool,
@@ -202,6 +207,38 @@ fn way_idle_cb(e: EventCtx<State, ExtIdleNotificationV1>) {
 fn wayland_connect(idle_limit: u64) -> WaylandState {
     let mut conn: Connection<_>;
     let globals: Vec<wayrs_client::protocol::wl_registry::GlobalArgs>;
+
+    match env::var("WAYLAND_DISPLAY") {
+        Ok(_) => { },
+        Err(_) => {
+            // Attempt to locate and set the WAYLAND_DISPLAY environment variable.
+            eprintln!("WAYLAND_DISPLAY is not set.  Attempting to identify...");
+
+            let uid: u32;
+            let mut found: bool = false;
+            
+            unsafe {
+                uid = getuid();
+            }
+            
+            for i in 1..10 {
+                let file = format!("/var/run/user/{}/wayland-{}", uid, i);
+                match fs::metadata(file.clone()) {
+                    Ok(_) => {
+                        println!("Found display in {}...Setting WAYLAND_DISPLAY", file);
+                        env::set_var("WAYLAND_DISPLAY", format!("wayland-{}", i));
+                        found = true;
+                        break;
+                    },
+                    Err(e) => { dbg!(e); }
+                }
+            }
+            if found == false {
+                eprintln!("Unable to identify Wayland display.");
+                return WaylandState::Disabled;
+            }
+        }
+    }
 
     let res = Connection::connect_and_collect_globals();
     match res {
